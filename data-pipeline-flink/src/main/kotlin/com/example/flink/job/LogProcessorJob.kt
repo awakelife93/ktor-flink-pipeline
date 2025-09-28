@@ -1,13 +1,15 @@
 package com.example.flink.job
 
 import com.example.flink.dto.LogCount
+import com.example.flink.dto.LogEvent
 import com.example.flink.module.configureFlinkModule
 import com.example.flink.module.logStreamExecutionEnvironment
 import com.example.flink.service.calculateLogCount
+import com.example.flink.service.calculateLogCountProcessingTime
 import com.example.flink.service.generateLogEvent
 import com.example.flink.service.keyByLogLevel
+import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.datastream.KeyedStream
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -26,12 +28,10 @@ class LogProcessorJob(
 				configureFlinkModule(kafkaTopic, kafkaBootstrapServers, "flink-log-consumer", "Kafka Log Event Source")
 
 			val logEventStream = generateLogEvent(dataStream)
-			val keyedStream = keyByLogLevel(logEventStream)
-			val logCountStream = calculateLogCount(keyedStream)
 
 			logger.info("Successfully configured Flink data stream processing.")
 
-			setupSinks(logCountStream, keyedStream)
+			setupSinks(logEventStream)
 
 			logStreamExecutionEnvironment.execute("Log Level Count Processor")
 		}.onFailure { exception ->
@@ -39,20 +39,32 @@ class LogProcessorJob(
 		}
 	}
 
-	private fun setupSinks(logCountStream: SingleOutputStreamOperator<LogCount>, keyedStream: KeyedStream<LogCount, String>) {
-		// Print total log counts sink
-		logCountStream.print("LogCounts")
+	private fun setupSinks(
+		logEventStream: DataStream<LogEvent>
+	) {
+		val keyedStream = keyByLogLevel(logEventStream)
 
-		// Setup error alert sink
-		setupErrorAlertSink(keyedStream)
+		// Setup total log count sink
+		setupTotalLogCountsSink(keyedStream)
+
+		// Setup processing time error alert sink
+		setupProcessingTimeErrorAlertSink(keyedStream)
 	}
 
-	private fun setupErrorAlertSink(keyedStream: KeyedStream<LogCount, String>) {
-		val logCount5MinutesStream = calculateLogCount(keyedStream, Duration.ofMinutes(5))
+	private fun setupTotalLogCountsSink(keyedStream: KeyedStream<LogCount, String>) {
+		calculateLogCount(keyedStream)
+			.name("TotalLogCountsSink")
+			.uid("TotalLogCountsSink")
+			.print("TotalLogCountsSink")
+	}
 
-		// Alert when ERROR logs exceed threshold (50+) sink
-		logCount5MinutesStream
+	private fun setupProcessingTimeErrorAlertSink(keyedStream: KeyedStream<LogCount, String>) {
+		val logCount5MinutesStreamForProcessingTime = calculateLogCountProcessingTime(keyedStream, Duration.ofMinutes(5))
+
+		logCount5MinutesStreamForProcessingTime
+			.name("ProcessingTimeErrorAlertSink")
+			.uid("ProcessingTimeErrorAlertSink")
 			.filter { it.level == "ERROR" && it.count >= 50 }
-			.print("ErrorAlerts")
+			.print("ProcessingTimeErrorAlertSink")
 	}
 }
