@@ -1,0 +1,71 @@
+[versions]
+kotlin = "2.2.20"
+ktor = "3.3.0"
+logback = "1.5.18"
+kafka = "4.1.0"
+flink = "1.20.2"
+flinkStreaming = "2.1.0"
+flinkKafkaConnector = "4.0.1-2.0"
+jackson = "2.18.2"
+
+[libraries]
+# Kotlin
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+
+# Ktor
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-serialization-jackson = { module = "io.ktor:ktor-serialization-jackson", version.ref = "ktor" }
+ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", version.ref = "ktor" }
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
+ktor-server-call-id = { module = "io.ktor:ktor-server-call-id", version.ref = "ktor" }
+ktor-server-double-receive = { module = "io.ktor:ktor-server-double-receive", version.ref = "ktor" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
+
+# Kafka
+kafka-clients = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
+
+# Flink
+flink-java = { module = "org.apache.flink:flink-java", version.ref = "flink" }
+flink-streaming-java = { module = "org.apache.flink:flink-streaming-java", version.ref = "flinkStreaming" }
+flink-connector-base = { module = "org.apache.flink:flink-connector-base", version.ref = "flinkStreaming" }
+flink-clients = { module = "org.apache.flink:flink-clients", version.ref = "flinkStreaming" }
+flink-connector-kafka = { module = "org.apache.flink:flink-connector-kafka", version.ref = "flinkKafkaConnector" }
+
+# Jackson
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+
+# Logging
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+[bundles]
+ktor-server = [
+    "ktor-server-core",
+    "ktor-server-netty",
+    "ktor-server-config-yaml",
+    "ktor-server-content-negotiation",
+    "ktor-serialization-jackson",
+    "ktor-server-status-pages",
+    "ktor-server-call-logging",
+    "ktor-server-call-id",
+    "ktor-server-double-receive"
+]
+
+flink-core = [
+    "flink-java",
+    "flink-streaming-java",
+    "flink-connector-base",
+    "flink-clients"
+]
+
+jackson = [
+    "jackson-module-kotlin",
+    "jackson-datatype-jsr310"
+]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
