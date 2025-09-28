@@ -18,29 +18,31 @@ val mapper = jacksonObjectMapper()
 private val logger: Logger = LoggerFactory.getLogger("LogProcessingService")
 
 fun generateLogEvent(dataStream: DataStream<String>): DataStream<LogEvent> {
-  return dataStream.flatMap { payload: String, out: Collector<LogEvent> ->
-    runCatching {
-      val logPayload: LogEventPayload = mapper.readValue(payload)
-      logPayload.events.forEach { event -> out.collect(event) }
-    }.onFailure { exception ->
-      logger.error("Failed to parse log payload: $payload", exception)
-    }
-  }.returns(LogEvent::class.java)
+	return dataStream.flatMap { payload: String, out: Collector<LogEvent> ->
+		runCatching {
+			val logPayload: LogEventPayload = mapper.readValue(payload)
+			logPayload.events.forEach { event -> out.collect(event) }
+		}.onFailure { exception ->
+			logger.error("Failed to parse log payload: $payload", exception)
+		}
+	}.returns(LogEvent::class.java)
 }
 
 fun keyByLogLevel(logEventStream: DataStream<LogEvent>): KeyedStream<LogCount, String> {
-  return logEventStream
-    .map { event -> LogCount(level = event.level, count = 1) }
-    .keyBy { it.level }
+	return logEventStream
+		.map { event -> LogCount(level = event.level, count = 1, timestamp = event.timestamp) }
+		.keyBy { it.level }
 }
 
 fun calculateLogCount(
-  keyedStream: KeyedStream<LogCount, String>,
-  time: Duration? = null
+	keyedStream: KeyedStream<LogCount, String>
+): SingleOutputStreamOperator<LogCount> = keyedStream
+	.reduce { a, b -> LogCount(a.level, a.count + b.count, maxOf(a.timestamp, b.timestamp)) }
+
+fun calculateLogCountProcessingTime(
+	keyedStream: KeyedStream<LogCount, String>,
+	time: Duration = Duration.ofMinutes(5)
 ): SingleOutputStreamOperator<LogCount> =
-  time?.let {
-    keyedStream
-      .window(TumblingProcessingTimeWindows.of(it))
-      .reduce { a, b -> LogCount(a.level, a.count + b.count) }
-  } ?: keyedStream
-    .reduce { a, b -> LogCount(a.level, a.count + b.count) }
+	keyedStream
+		.window(TumblingProcessingTimeWindows.of(time))
+		.reduce { a, b -> LogCount(a.level, a.count + b.count, maxOf(a.timestamp, b.timestamp)) }
