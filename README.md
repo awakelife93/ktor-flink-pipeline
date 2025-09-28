@@ -207,32 +207,26 @@ curl -X POST http://localhost:8085/start
 This will start generating random log events continuously. You'll see real-time stream processing output like:
 
 ```
-LogCounts:4> LogCount(level=WARN, count=1)
-LogCounts:8> LogCount(level=INFO, count=1)
-LogCounts:2> LogCount(level=ERROR, count=1)
-LogCounts:2> LogCount(level=ERROR, count=2)
-LogCounts:2> LogCount(level=ERROR, count=3)
-LogCounts:4> LogCount(level=WARN, count=2)
-LogCounts:4> LogCount(level=WARN, count=3)
-LogCounts:8> LogCount(level=INFO, count=2)
-LogCounts:2> LogCount(level=ERROR, count=4)
-LogCounts:4> LogCount(level=WARN, count=4)
-LogCounts:2> LogCount(level=ERROR, count=5)
-LogCounts:2> LogCount(level=ERROR, count=6)
-LogCounts:4> LogCount(level=WARN, count=5)
-LogCounts:2> LogCount(level=ERROR, count=7)
-LogCounts:2> LogCount(level=ERROR, count=8)
-LogCounts:8> LogCount(level=INFO, count=3)
-LogCounts:8> LogCount(level=INFO, count=4)
-LogCounts:2> LogCount(level=ERROR, count=9)
-LogCounts:2> LogCount(level=ERROR, count=10)
-LogCounts:4> LogCount(level=WARN, count=6)
-LogCounts:4> LogCount(level=WARN, count=7)
-LogCounts:4> LogCount(level=WARN, count=8)
+TotalLogCountsSink:8> LogCount(level=INFO, count=3, timestamp=1759052980437)
+TotalLogCountsSink:4> LogCount(level=WARN, count=3, timestamp=1759052981070)
+TotalLogCountsSink:8> LogCount(level=INFO, count=4, timestamp=1759052982422)
+TotalLogCountsSink:2> LogCount(level=ERROR, count=2, timestamp=1759052982998)
+TotalLogCountsSink:8> LogCount(level=INFO, count=5, timestamp=1759052985764)
+TotalLogCountsSink:4> LogCount(level=WARN, count=4, timestamp=1759052988453)
+TotalLogCountsSink:4> LogCount(level=WARN, count=5, timestamp=1759052991409)
+TotalLogCountsSink:8> LogCount(level=INFO, count=6, timestamp=1759052992237)
+TotalLogCountsSink:4> LogCount(level=WARN, count=6, timestamp=1759052994323)
+TotalLogCountsSink:4> LogCount(level=WARN, count=7, timestamp=1759052995748)
+TotalLogCountsSink:2> LogCount(level=ERROR, count=3, timestamp=1759052997628)
+TotalLogCountsSink:2> LogCount(level=ERROR, count=4, timestamp=1759052999421)
+ProcessingTimeErrorAlertSink:2> LogCount(level=ERROR, count=4, timestamp=1759052999421)
+TotalLogCountsSink:4> LogCount(level=WARN, count=8, timestamp=1759053001275)
+TotalLogCountsSink:8> LogCount(level=INFO, count=7, timestamp=1759053002610)
+TotalLogCountsSink:2> LogCount(level=ERROR, count=5, timestamp=1759053005309)
 ...
 ```
 
-The numbers (e.g., `LogCounts:4>`, `LogCounts:8>`, `LogCounts:2>`) represent the Flink subtask indices, showing parallel processing across
+The numbers (e.g., `TotalLogCountsSink:4>`, `TotalLogCountsSink:8>`, `ProcessingTimeErrorAlertSink:2>`) represent the Flink subtask indices, showing parallel processing across
 multiple subtasks. Each log level is processed and aggregated separately, with running counts that increment as new events are processed.
 
 **Stop automatic data generation**
