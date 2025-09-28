@@ -8,23 +8,23 @@ import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 
 val logStreamExecutionEnvironment: StreamExecutionEnvironment by lazy {
-  StreamExecutionEnvironment.getExecutionEnvironment()
+	StreamExecutionEnvironment.getExecutionEnvironment()
 }
 
-fun configureFlinkModule(topic: String, bootstrapServers: String): DataStream<String> {
-  val source = KafkaSource.builder<String>()
-    .apply {
-      setBootstrapServers(bootstrapServers)
-      setTopics(topic)
-      setGroupId("flink-log-consumer")
-      setStartingOffsets(OffsetsInitializer.latest())
-      setValueOnlyDeserializer(SimpleStringSchema())
-    }
-    .build()
+fun configureFlinkModule(topic: String, bootstrapServers: String, groupId: String, sourceName: String): DataStream<String> {
+	val source = KafkaSource.builder<String>()
+		.apply {
+			setBootstrapServers(bootstrapServers)
+			setTopics(topic)
+			setGroupId(groupId)
+			setStartingOffsets(OffsetsInitializer.latest())
+			setValueOnlyDeserializer(SimpleStringSchema())
+		}
+		.build()
 
-  return logStreamExecutionEnvironment.fromSource(
-    source,
-    WatermarkStrategy.noWatermarks(),
-    "Kafka Source"
-  )
+	return logStreamExecutionEnvironment.fromSource(
+		source,
+		WatermarkStrategy.noWatermarks(),
+		sourceName
+	)
 }
