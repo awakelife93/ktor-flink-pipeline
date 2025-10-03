@@ -14,7 +14,7 @@ data-pipeline/
 │   ├── build.gradle.kts
 │   ├── src/main/kotlin/
 │   │   └── com/example/api/
-│   │       ├── Application.kt
+│   │       ├── Main.kt
 │   │       ├── dto/
 │   │       ├── module/
 │   │       ├── route/
@@ -226,7 +226,8 @@ TotalLogCountsSink:2> LogCount(level=ERROR, count=5, timestamp=1759053005309)
 ...
 ```
 
-The numbers (e.g., `TotalLogCountsSink:4>`, `TotalLogCountsSink:8>`, `ProcessingTimeErrorAlertSink:2>`) represent the Flink subtask indices, showing parallel processing across
+The numbers (e.g., `TotalLogCountsSink:4>`, `TotalLogCountsSink:8>`, `ProcessingTimeErrorAlertSink:2>`) represent the Flink subtask indices,
+showing parallel processing across
 multiple subtasks. Each log level is processed and aggregated separately, with running counts that increment as new events are processed.
 
 **Stop automatic data generation**
