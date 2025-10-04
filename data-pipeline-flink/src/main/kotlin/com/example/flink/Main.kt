@@ -13,7 +13,6 @@ private val logger: Logger = LoggerFactory.getLogger("FlinkLogProcessor")
 
 fun main() {
 	logger.info("Starting Flink Log Processor Application...")
-	logger.info("Execution mode - JAR: ${KafkaConfigSelector.isRunningFromJar}, Kafka: ${KafkaConfigSelector.kafkaBootstrapServers}")
 
 	val jobs = initializeJobs()
 	runJobs(jobs)

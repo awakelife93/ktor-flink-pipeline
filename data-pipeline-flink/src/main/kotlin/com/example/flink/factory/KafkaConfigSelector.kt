@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 private val logger: Logger = LoggerFactory.getLogger("KafkaConfigSelector")
 
 object KafkaConfigSelector {
-	val isRunningFromJar = this::class.java.protectionDomain
+	private val isRunningFromJar = this::class.java.protectionDomain
 		.codeSource.location.toString().contains(".jar")
 
 	val kafkaBootstrapServers = if (isRunningFromJar) {
